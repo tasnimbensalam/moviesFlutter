@@ -1,6 +1,6 @@
-import 'package:movies/src/features/auth/models/app_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:movies/src/features/auth/models/app_user.dart';
 
 final firestoreRepositoryProvider = Provider(
   (ref) => FirestoreRepository(),

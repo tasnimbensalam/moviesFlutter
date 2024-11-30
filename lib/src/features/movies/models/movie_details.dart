@@ -10,7 +10,6 @@ class MovieDetails {
       required this.genres,
       required this.overview,
       required this.similar});
-
   final String backdropPath;
   final String posterPath;
   final String title;
