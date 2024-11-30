@@ -1,12 +1,14 @@
-import 'package:movies/src/core/constants/app_sizes.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:movies/src/features/account/view/widgets/favorite_button.dart';
 import 'package:movies/src/features/account/view/widgets/watchlist_button.dart';
 import 'package:movies/src/features/movies/view/widgets/chip.dart';
 import 'package:movies/src/features/movies/view/widgets/movie_slider.dart';
 import 'package:movies/src/features/movies/view/widgets/rating.dart';
-import 'package:movies/src/features/movies/viewmodel/movies_viewmodel.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../../core/constants/app_sizes.dart';
+import '../../viewmodel/movies_viewmodel.dart';
 
 class MovieDetailsScreen extends ConsumerWidget {
   const MovieDetailsScreen(this.movieId, {super.key});
@@ -68,10 +70,32 @@ class MovieDetailsScreen extends ConsumerWidget {
                                   .onSurface
                                   .withOpacity(0.5),
                             ),
-                          )
+                          ),
+                          // Display trailer button if available
+                          if (movie.trailerKey != null) ...[
+                            gapH8,
+                            ElevatedButton.icon(
+                              onPressed: () async {
+                                final url =
+                                    'https://www.youtube.com/watch?v=${movie.trailerKey}';
+                                if (await canLaunch(url)) {
+                                  await launch(url);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content:
+                                          Text('Could not launch trailer.'),
+                                    ),
+                                  );
+                                }
+                              },
+                              icon: const Icon(Icons.play_circle_fill),
+                              label: const Text('Watch Trailer'),
+                            ),
+                          ],
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
                 gapH12,
@@ -79,35 +103,33 @@ class MovieDetailsScreen extends ConsumerWidget {
                   spacing: 4,
                   runSpacing: 4,
                   children: [
-                    for (final genre in movie.genres)
-                      MyChip(genre)
+                    for (final genre in movie.genres) MyChip(genre),
                   ],
                 ),
                 gapH12,
                 Text(
                   movie.overview,
                   style: TextStyle(
-                      fontSize: 16,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacity(0.7)),
+                    fontSize: 16,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.7),
+                  ),
                 ),
                 gapH24,
                 MovieSlider(
                   title: 'Similar movies',
                   movies: movie.similar,
-                )
+                ),
               ],
             ),
           ),
         );
       },
-      loading: () => const Center(
-        child: Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
+      loading: () => const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
         ),
       ),
       error: (error, stackTrace) => Scaffold(
