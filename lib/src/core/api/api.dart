@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+
 class TMDBApi {
   final String _apiKey = 'c1f46d17355ae2cb31a99e2888a39a48';
   final String _baseUrl = 'api.themoviedb.org';
@@ -28,8 +32,8 @@ class TMDBApi {
   // Movie Details with Append to Response (Credits, Similar, and Videos)
   Uri movieDetails(int movieId) =>
       _buildUri(endpoint: 'movie/$movieId', query: {
-        'append_to_response': 'credits,similar,videos'
-      }); // Added 'videos'
+        'append_to_response': 'credits,similar,videos',
+      });
 
   // Image URL
   Uri image(String imagePath) =>
@@ -41,14 +45,11 @@ class TMDBApi {
     int? page,
     Map<String, dynamic>? query,
   }) {
-    Map<String, dynamic> queryParameters = {
+    final queryParameters = {
       'api_key': _apiKey,
       if (page != null) 'page': page.toString(),
+      if (query != null) ...query,
     };
-
-    if (query != null) {
-      queryParameters.addAll(query);
-    }
 
     return Uri(
       scheme: 'https',
@@ -56,5 +57,31 @@ class TMDBApi {
       path: '/3/$endpoint',
       queryParameters: queryParameters,
     );
+  }
+
+  // Assume this function is already defined elsewhere
+  Uri searchMovies(String query) {
+    // Replace with your actual movie search API URL construction
+    return Uri.parse('https://api.example.com/search?query=$query');
+  }
+
+  Future<List<dynamic>> fetchSearchResults(String query) async {
+    try {
+      // Use the existing searchMovies method instead of constructing a new URL
+      final url = searchMovies(query);
+
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body) as Map<String, dynamic>;
+        return data['results'] ?? [];
+      } else {
+        throw Exception(
+            'Failed to fetch movies: Status ${response.statusCode}');
+      }
+    } catch (e) {
+      // Add better error handling
+      throw Exception('Failed to fetch movies: $e');
+    }
   }
 }

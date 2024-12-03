@@ -1,7 +1,9 @@
-import 'package:movies/src/features/movies/models/api_response.dart';
-import 'package:movies/src/features/movies/view/widgets/movie_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:movies/src/features/movies/models/api_response.dart';
+import 'package:movies/src/features/movies/view/widgets/movie_card.dart';
+
+import 'movies_search_screen.dart';
 
 class MovieGrid extends ConsumerWidget {
   const MovieGrid(
@@ -20,6 +22,20 @@ class MovieGrid extends ConsumerWidget {
           title,
           style: const TextStyle(fontSize: 20),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              // Navigate to the search page when search icon is clicked
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MovieSearchPage(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: GridView.builder(
         padding: const EdgeInsets.all(16),
