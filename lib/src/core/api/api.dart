@@ -59,15 +59,15 @@ class TMDBApi {
     );
   }
 
-  // Assume this function is already defined elsewhere
-  Uri searchMovies(String query) {
-    // Replace with your actual movie search API URL construction
-    return Uri.parse('https://api.example.com/search?query=$query');
+  Uri searchMovies(String query, {int page = 1}) {
+    return _buildUri(endpoint: 'search/movie', query: {
+      'query': query,
+      'page': page.toString(),
+    });
   }
 
   Future<List<dynamic>> fetchSearchResults(String query) async {
     try {
-      // Use the existing searchMovies method instead of constructing a new URL
       final url = searchMovies(query);
 
       final response = await http.get(url);
@@ -80,7 +80,6 @@ class TMDBApi {
             'Failed to fetch movies: Status ${response.statusCode}');
       }
     } catch (e) {
-      // Add better error handling
       throw Exception('Failed to fetch movies: $e');
     }
   }
